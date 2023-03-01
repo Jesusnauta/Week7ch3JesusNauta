@@ -32,3 +32,4 @@ Editar 'thing'
 
 Página de detalle
 # week6ch5-Jesusnauta
+# week7Ch3Jesusnauta
