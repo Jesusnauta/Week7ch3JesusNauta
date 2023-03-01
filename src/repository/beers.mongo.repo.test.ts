@@ -34,7 +34,7 @@ describe('Given BeerMongoRepo', () => {
   });
 
   describe('When i use create', () => {
-    test('Then it should create a new Char', async () => {
+    test('Then it should create a new Beer', async () => {
       (BeerModel.find as jest.Mock).mockResolvedValue('[{"id": "1"}]');
 
       expect(BeerModel.create).toHaveBeenCalled();
