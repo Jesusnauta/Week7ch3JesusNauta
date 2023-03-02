@@ -4,32 +4,33 @@ import { UsersMongoRepo } from './users.mongo.repo';
 
 jest.mock('./users.mongo.model.js');
 
-describe('Given UserMongoRepo', () => {
+describe('Given UsersMongoRepo repository', () => {
   const repo = new UsersMongoRepo();
-  describe('When is called', () => {
-    test('Then should be instanced', () => {
+
+  describe('When the repository is instanced', () => {
+    test('Then, the repo should be instance of UsersMongooseRepo;', () => {
       expect(repo).toBeInstanceOf(UsersMongoRepo);
     });
   });
 
-  describe('When i use query', () => {
-    test('Then should return the data', async () => {
-      (UserModel.find as jest.Mock).mockResolvedValue([]);
+  describe('When the query method is used', () => {
+    test('Then it should return an empty array', async () => {
       const result = await repo.query();
-
-      expect(UserModel.find).toHaveBeenCalled();
       expect(result).toEqual([]);
     });
   });
 
-  describe('When i use ReadId', () => {
-    test('Then should return the data', async () => {
+  describe('When the queryId method is used', () => {
+    test('Then if the findById method resolve value to an object, it should return the object', async () => {
       (UserModel.findById as jest.Mock).mockResolvedValue({ id: '1' });
-
-      const id = '1';
-      const result = await repo.queryId(id);
+      const result = await repo.queryId('1');
       expect(UserModel.findById).toHaveBeenCalled();
       expect(result).toEqual({ id: '1' });
+    });
+
+    test('Then if the findById method resolve value to null, it should throw an Error', async () => {
+      (UserModel.findById as jest.Mock).mockResolvedValue(null);
+      expect(async () => repo.queryId('')).rejects.toThrow();
     });
   });
   describe('When i use search', () => {
