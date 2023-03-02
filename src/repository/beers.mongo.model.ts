@@ -15,11 +15,15 @@ const beerSchema = new Schema<Beer>({
     type: Number,
     require: true,
   },
+  owner: {
+    type: SchemaTypes.ObjectId,
+    ref: 'User',
+  },
 });
 
 beerSchema.set('toJSON', {
   transform(_document, returnedObject) {
-    returnedObject.id = returnedObject._id; // Transformamos _id a id en el front
+    returnedObject.id = returnedObject._id;
     delete returnedObject.__v;
     delete returnedObject._id;
   },
