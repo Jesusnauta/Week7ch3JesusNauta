@@ -33,11 +33,13 @@ describe('Given BeerMongoRepo', () => {
     });
   });
 
-  describe('When i use create', () => {
-    test('Then it should create a new Beer', async () => {
-      (BeerModel.find as jest.Mock).mockResolvedValue('[{"id": "1"}]');
+  describe('When the create method is used', () => {
+    test('Then if it has an object to create, it should return the created object', async () => {
+      (BeerModel.create as jest.Mock).mockResolvedValue({ name: 'test' });
 
+      const result = await repo.create({ name: 'test' });
       expect(BeerModel.create).toHaveBeenCalled();
+      expect(result).toEqual({ name: 'test' });
     });
   });
 
@@ -62,14 +64,17 @@ describe('Given BeerMongoRepo', () => {
 
   describe('When the delete method is used', () => {
     beforeEach(async () => {
-      (BeerModel.findByIdAndRemove as jest.Mock).mockResolvedValue({
-        id: '1',
-      });
+      (BeerModel.findByIdAndDelete as jest.Mock).mockResolvedValue({});
     });
 
-    test('Then if it has an object to delete, the readFile function should be called', async () => {
+    test('Then if it has an object to delete with its ID, the findByIdAndDelete function should be called', async () => {
       await repo.destroy('1');
-      expect(BeerModel.findByIdAndRemove).toHaveBeenCalled();
+      expect(BeerModel.findByIdAndDelete).toHaveBeenCalled();
+    });
+
+    test('Then if the findByIdAndDelete method resolve value to undefined, it should throw an Error', async () => {
+      (BeerModel.findByIdAndDelete as jest.Mock).mockResolvedValue(null);
+      expect(async () => repo.destroy('')).rejects.toThrow();
     });
   });
 });

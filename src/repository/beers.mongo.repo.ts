@@ -12,7 +12,7 @@ export class BeersMongoRepo implements Repo<Beer> {
 
   async query(): Promise<Beer[]> {
     debug('query');
-    const data = await BeerModel.find();
+    const data = await BeerModel.find().populate('owner');
     return data;
   }
 
@@ -23,7 +23,7 @@ export class BeersMongoRepo implements Repo<Beer> {
     return data;
   }
 
-  async search(query: { key: string; value: unknown }) {
+  async search(query: { key: string; value: unknown }): Promise<Beer[]> {
     debug('search');
     const data = await BeerModel.find({ [query.key]: query.value });
     return data;
