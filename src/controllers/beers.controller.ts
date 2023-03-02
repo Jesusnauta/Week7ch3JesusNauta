@@ -2,10 +2,13 @@ import { Response, Request, NextFunction } from 'express';
 import { Repo } from '../repository/repo.interface.js';
 import { Beer } from '../entities/beer.js';
 import createDebug from 'debug';
+import { RequestPlus } from '../interceptors/logged.js';
+import { User } from '../entities/user.js';
+import { HTTPError } from '../errors/errors.js';
 const debug = createDebug('W6:controller');
 export class BeersController {
   // eslint-disable-next-line no-useless-constructor
-  constructor(public repo: Repo<Beer>) {}
+  constructor(public repo: Repo<Beer>, public repoUsers: Repo<User>) {}
 
   async getAll(_req: Request, resp: Response, next: NextFunction) {
     try {
@@ -31,12 +34,23 @@ export class BeersController {
     }
   }
 
-  async post(req: Request, resp: Response, next: NextFunction) {
+  async post(req: RequestPlus, resp: Response, next: NextFunction) {
     try {
       debug('post');
-      const data = await this.repo.create(req.body);
+      const userId = req.info?.id;
+      if (!userId) throw new HTTPError(404, 'Not found', 'Not found user Id');
+      const actualUser = await this.repoUsers.queryId(userId);
+      req.body.owner = req.info?.id; // Validamos que el owner usa su token
+      const newBeer = await this.repo.create(req.body);
+
+      // Opcion bidireccionalidad
+
+      actualUser.beers.push(newBeer);
+
+      this.repoUsers.update(actualUser);
+
       resp.json({
-        results: [data],
+        results: [newBeer],
       });
     } catch (error) {
       next(error);

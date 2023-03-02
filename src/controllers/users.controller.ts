@@ -14,15 +14,18 @@ export class UsersController {
     try {
       debug('register:post');
       if (!req.body.email || !req.body.password)
+        // Verifica si hay email o password
         throw new HTTPError(401, 'Unauthorized', 'Invalid Email or password');
       req.body.password = await Auth.hash(req.body.password);
+      req.body.beers = [];
       const data = await this.repo.create(req.body);
       resp.status(201);
       resp.json({
         results: [data],
       });
     } catch (error) {
-      next(error);
+      // No hay  email, viene aqui
+      next(error); // Sigue a next (toHaveBeenCalled) y termina el test
     }
   }
 
@@ -40,6 +43,7 @@ export class UsersController {
       if (!(await Auth.compare(req.body.password, data[0].password)))
         throw new HTTPError(401, 'Unauthorized', 'Password not match');
       const payload: PayloadToken = {
+        id: data[0].id,
         email: data[0].email,
         role: 'admin',
       };
@@ -54,7 +58,7 @@ export class UsersController {
 
     // Llegan datos usuario en el Bo0dy
 
-    // Seach by email
+    // Search by email
 
     // Si lo tengo -> crear el token
 
@@ -62,6 +66,6 @@ export class UsersController {
 
     // Si no lo tengo
 
-    // Send erreor
+    // Send error
   }
 }
